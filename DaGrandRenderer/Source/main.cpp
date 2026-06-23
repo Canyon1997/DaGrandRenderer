@@ -199,6 +199,10 @@ int main(int argc, char* argv[])
         glm::mat4 model = glm::mat4(1.0f);
         glUniformMatrix4fv(glGetUniformLocation(objectShader.getProgram(), "model"), 1, false, glm::value_ptr(model));
 
+        glm::mat3 normalMatrix = glm::mat3(model);
+        normalMatrix = glm::transpose(glm::inverse(normalMatrix));
+        glUniformMatrix3fv(glGetUniformLocation(objectShader.getProgram(), "normalMatrix"), 1, false, glm::value_ptr(normalMatrix));
+
         glm::mat4 view = glm::mat4(1.0f);
         view = glm::lookAt(cameraPos, cameraPos + cameraForwardDir, cameraUp);
         glUniformMatrix4fv(glGetUniformLocation(objectShader.getProgram(), "view"), 1, false, glm::value_ptr(view));
