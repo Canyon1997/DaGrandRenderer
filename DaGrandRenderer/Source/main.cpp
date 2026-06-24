@@ -34,7 +34,7 @@ void RotateCamera(const double& xPos, const double& yPos);
 glm::mat4 customLookAt(const glm::vec3& eye, const glm::vec3& center, const glm::vec3& up);
 
 // global light source
-glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+glm::vec3 lightPos(0.0f, 1.0f, 0.0f);
 glm::vec3 lightColor(1.0f, 1.0f, 1.0f);
 
 // delta time
@@ -220,6 +220,8 @@ int main(int argc, char* argv[])
         glBindVertexArray(VAO2);
 
         glm::mat4 lightModel = glm::mat4(1.0f);
+        lightPos.x = 2.0f * sin(glfwGetTime());
+        lightPos.z = 2.0f * cos(glfwGetTime());
         lightModel = glm::translate(lightModel, lightPos);
         lightModel = glm::scale(lightModel, glm::vec3(0.2f));
         glUniformMatrix4fv(glGetUniformLocation(lightSourceShader.getProgram(), "model"), 1, false, glm::value_ptr(lightModel));
