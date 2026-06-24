@@ -192,20 +192,21 @@ int main(int argc, char* argv[])
         objectShader.use();
         glUniform3f(glGetUniformLocation(objectShader.getProgram(), "objectColor"), 1.0f, 0.5f, 0.31f);
         glUniform3f(glGetUniformLocation(objectShader.getProgram(), "lightColor"), lightColor.x, lightColor.y, lightColor.z);
-        glUniform3f(glGetUniformLocation(objectShader.getProgram(), "lightSourcePos"), lightPos.x, lightPos.y, lightPos.z);
 
         glBindVertexArray(VAO1);
 
         glm::mat4 model = glm::mat4(1.0f);
         glUniformMatrix4fv(glGetUniformLocation(objectShader.getProgram(), "model"), 1, false, glm::value_ptr(model));
 
-        glm::mat3 normalMatrix = glm::mat3(model);
-        normalMatrix = glm::transpose(glm::inverse(normalMatrix));
-        glUniformMatrix3fv(glGetUniformLocation(objectShader.getProgram(), "normalMatrix"), 1, false, glm::value_ptr(normalMatrix));
-
         glm::mat4 view = glm::mat4(1.0f);
         view = glm::lookAt(cameraPos, cameraPos + cameraForwardDir, cameraUp);
         glUniformMatrix4fv(glGetUniformLocation(objectShader.getProgram(), "view"), 1, false, glm::value_ptr(view));
+
+        glm::mat3 normalMatrix = glm::transpose(glm::inverse(view * model));
+        glUniformMatrix3fv(glGetUniformLocation(objectShader.getProgram(), "normalMatrix"), 1, false, glm::value_ptr(normalMatrix));
+
+        glm::vec3 viewLightPos = glm::vec3(view * glm::vec4(lightPos, 1.0));
+        glUniform3f(glGetUniformLocation(objectShader.getProgram(), "lightSourcePos"), viewLightPos.x, viewLightPos.y, viewLightPos.z);
 
         glm::mat4 projection = glm::perspective(glm::radians(fov), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
         glUniformMatrix4fv(glGetUniformLocation(objectShader.getProgram(), "proj"), 1, false, glm::value_ptr(projection));
