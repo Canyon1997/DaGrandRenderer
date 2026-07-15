@@ -38,3 +38,4 @@
 # Executables
 x64/
 .vs/
+out/

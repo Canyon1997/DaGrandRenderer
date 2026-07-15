@@ -27,6 +27,7 @@ public:
     {
         glUseProgram(shaderProgram);
     }
+
     const unsigned int getProgram() const
     {
         return shaderProgram;
