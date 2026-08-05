@@ -167,6 +167,14 @@ int main(int argc, char* argv[])
 	diffuseMap.generate2DTexture_RGBA();
     glBindTexture(GL_TEXTURE_2D, 0);
 
+    Texture specularMap("container2_specular.png");
+    specularMap.generate2DTexture_RGBA();
+	glBindTexture(GL_TEXTURE_2D, 1);
+
+    Texture emissionMap("matrix.jpg");
+    emissionMap.generate2DTexture_RGB();
+    glBindTexture(GL_TEXTURE_2D, 2);
+
     // shaders
     Shader::flipVerticallyOnLoad(true);
 
@@ -201,17 +209,22 @@ int main(int argc, char* argv[])
 
         // render model 1
         objectShader.use();
-        glBindVertexArray(VAO1);
 
         glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, diffuseMap.getBuffer());
+        glBindTexture(GL_TEXTURE_2D, diffuseMap.getBuffer());
 
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, specularMap.getBuffer());;
+
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, emissionMap.getBuffer());
 
 		glm::vec3 objSpec(1.0f, 1.04f, 1.0f);
         float objShine = 128.0f;
 		glUniform1i(glGetUniformLocation(objectShader.getProgram(), "material.diffuse"), 0);
-        glUniform3fv(glGetUniformLocation(objectShader.getProgram(), "material.specular"), 1, glm::value_ptr(objSpec));
+        glUniform1i(glGetUniformLocation(objectShader.getProgram(), "material.specular"), 1);
         glUniform1f(glGetUniformLocation(objectShader.getProgram(), "material.shininess"), objShine);
+        glUniform1i(glGetUniformLocation(objectShader.getProgram(), "material.emission"), 2);
 
         
         glm::vec3 lightAmb(0.1f);
@@ -233,11 +246,11 @@ int main(int argc, char* argv[])
         glm::vec3 viewLightPos = glm::vec3(view * glm::vec4(lightPos, 1.0));
         glUniform3f(glGetUniformLocation(objectShader.getProgram(), "lightSourcePos"), viewLightPos.x, viewLightPos.y, viewLightPos.z);
 
+        glBindVertexArray(VAO1);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // render model 2
         lightSourceShader.use();
-        glBindVertexArray(VAO2);
 
         glUniform3f(glGetUniformLocation(lightSourceShader.getProgram(), "lightColor"), lightColor.x, lightColor.y, lightColor.z);
 
@@ -248,6 +261,7 @@ int main(int argc, char* argv[])
         glUniformMatrix4fv(glGetUniformLocation(lightSourceShader.getProgram(), "view"), 1, false, glm::value_ptr(view));
         glUniformMatrix4fv(glGetUniformLocation(lightSourceShader.getProgram(), "proj"), 1, false, glm::value_ptr(projection));
 
+        glBindVertexArray(VAO2);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
 
