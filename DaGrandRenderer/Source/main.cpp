@@ -1,14 +1,14 @@
 #include <glad/glad.h>
-#include <glfw3.h>
+#include <glfw/glfw3.h>
 #include <iostream>
 #include "Shader.h"
 #include <string>
 #include "Texture.h"
 
 // Math Libraries
-#include <glm.hpp>
-#include <gtc/matrix_transform.hpp>
-#include <gtc/type_ptr.hpp>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 
 // Window
 #include <windows.h>
@@ -171,10 +171,6 @@ int main(int argc, char* argv[])
     specularMap.generate2DTexture_RGBA();
 	glBindTexture(GL_TEXTURE_2D, 1);
 
-    Texture emissionMap("matrix.jpg");
-    emissionMap.generate2DTexture_RGB();
-    glBindTexture(GL_TEXTURE_2D, 2);
-
     // shaders
     Shader::flipVerticallyOnLoad(true);
 
@@ -216,15 +212,11 @@ int main(int argc, char* argv[])
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, specularMap.getBuffer());;
 
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, emissionMap.getBuffer());
-
 		glm::vec3 objSpec(1.0f, 1.04f, 1.0f);
         float objShine = 128.0f;
 		glUniform1i(glGetUniformLocation(objectShader.getProgram(), "material.diffuse"), 0);
         glUniform1i(glGetUniformLocation(objectShader.getProgram(), "material.specular"), 1);
         glUniform1f(glGetUniformLocation(objectShader.getProgram(), "material.shininess"), objShine);
-        glUniform1i(glGetUniformLocation(objectShader.getProgram(), "material.emission"), 2);
 
         
         glm::vec3 lightAmb(0.1f);
