@@ -132,6 +132,20 @@ int main(int argc, char* argv[])
         -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f, 1.0f
     };
 
+    // positions all containers
+    glm::vec3 cubePositions[] = {
+        glm::vec3( 0.0f,  0.0f,  0.0f),
+        glm::vec3( 2.0f,  5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3( 2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f,  3.0f, -7.5f),
+        glm::vec3( 1.3f, -2.0f, -2.5f),
+        glm::vec3( 1.5f,  2.0f, -2.5f),
+        glm::vec3( 1.5f,  0.2f, -1.5f),
+        glm::vec3(-1.3f,  1.0f, -1.5f)
+    };
+
     unsigned int VBO1;
     unsigned int VAO1;
 
@@ -198,7 +212,7 @@ int main(int argc, char* argv[])
         view = glm::lookAt(cameraPos, cameraPos + cameraForwardDir, cameraUp);
         glm::mat4 projection = glm::perspective(glm::radians(fov), (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT, 0.1f, 100.0f);
 
-        // clear buffers
+
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -212,7 +226,6 @@ int main(int argc, char* argv[])
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, specularMap.getBuffer());;
 
-		glm::vec3 objSpec(1.0f, 1.04f, 1.0f);
         float objShine = 128.0f;
 		glUniform1i(glGetUniformLocation(objectShader.getProgram(), "material.diffuse"), 0);
         glUniform1i(glGetUniformLocation(objectShader.getProgram(), "material.specular"), 1);
@@ -226,20 +239,31 @@ int main(int argc, char* argv[])
         glUniform3fv(glGetUniformLocation(objectShader.getProgram(), "light.diffuse"), 1, glm::value_ptr(lightDiff));
         glUniform3fv(glGetUniformLocation(objectShader.getProgram(), "light.specular"), 1, glm::value_ptr(lightSpec));
 
-        glm::mat4 model = glm::mat4(1.0f);
-        glUniformMatrix4fv(glGetUniformLocation(objectShader.getProgram(), "model"), 1, false, glm::value_ptr(model));
+        glm::vec3 lightDir = glm::normalize(glm::vec3(-0.2f, -1.0f, -0.3f));
+        glm::vec3 viewLightDir = glm::normalize(view * glm::vec4(lightDir, 0.0f));
+        glUniform3fv(glGetUniformLocation(objectShader.getProgram(), "light.direction"), 1, glm::value_ptr(viewLightDir));
+
         glUniformMatrix4fv(glGetUniformLocation(objectShader.getProgram(), "view"), 1, false, glm::value_ptr(view));
         glUniformMatrix4fv(glGetUniformLocation(objectShader.getProgram(), "proj"), 1, false, glm::value_ptr(projection));
-
-
-        glm::mat3 normalMatrix = glm::transpose(glm::inverse(view * model));
-        glUniformMatrix3fv(glGetUniformLocation(objectShader.getProgram(), "normalMatrix"), 1, false, glm::value_ptr(normalMatrix));
 
         glm::vec3 viewLightPos = glm::vec3(view * glm::vec4(lightPos, 1.0));
         glUniform3f(glGetUniformLocation(objectShader.getProgram(), "lightSourcePos"), viewLightPos.x, viewLightPos.y, viewLightPos.z);
 
         glBindVertexArray(VAO1);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+
+        for (uint8_t i = 0; i < 10; i++)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, cubePositions[i]);
+            float angle = 20.0f * i;
+            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            glUniformMatrix4fv(glGetUniformLocation(objectShader.getProgram(), "model"), 1, false, glm::value_ptr(model));
+
+            glm::mat3 normalMatrix = glm::transpose(glm::inverse(view * model));
+            glUniformMatrix3fv(glGetUniformLocation(objectShader.getProgram(), "normalMatrix"), 1, false, glm::value_ptr(normalMatrix));
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
+
 
         // render model 2
         lightSourceShader.use();

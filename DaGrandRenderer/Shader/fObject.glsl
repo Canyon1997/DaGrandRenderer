@@ -1,6 +1,5 @@
 #version 330 core
 
-// structs
 struct Material {
     sampler2D diffuse;
     sampler2D specular;
@@ -9,6 +8,7 @@ struct Material {
 
 
 struct Light {
+    vec3 direction;
     vec3 ambient;
     vec3 diffuse;
     vec3 specular;
@@ -17,11 +17,10 @@ struct Light {
 
 in vec2 texCoord;
 
-// in view space
+// view space
 in vec3 fragPos;
 in vec3 surfaceNormal;
-
-uniform vec3 lightSourcePos; // in view space
+uniform vec3 lightSourcePos;
 
 uniform Material material;
 uniform Light light;
@@ -34,7 +33,7 @@ void main()
 
     vec3 ambient = vec3(texture(material.diffuse, texCoord)) * light.ambient;
 
-    vec3 lightDir = normalize(lightSourcePos - fragPos);
+    vec3 lightDir = normalize(-light.direction); // lightSourcePos - fragPos
     float diffuseStrength = max(dot(surfNorm, lightDir), 0.0);
     vec3 diffuse = diffuseStrength * vec3(texture(material.diffuse, texCoord)) * light.diffuse;
 
