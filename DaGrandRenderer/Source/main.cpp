@@ -239,15 +239,21 @@ int main(int argc, char* argv[])
         glUniform3fv(glGetUniformLocation(objectShader.getProgram(), "light.diffuse"), 1, glm::value_ptr(lightDiff));
         glUniform3fv(glGetUniformLocation(objectShader.getProgram(), "light.specular"), 1, glm::value_ptr(lightSpec));
 
+        glUniform1f(glGetUniformLocation(objectShader.getProgram(), "light.constant"), 1.0f);
+        glUniform1f(glGetUniformLocation(objectShader.getProgram(), "light.linear"), 0.09f);
+        glUniform1f(glGetUniformLocation(objectShader.getProgram(), "light.quadratic"), 0.032f);
+
         glm::vec3 lightDir = glm::normalize(glm::vec3(-0.2f, -1.0f, -0.3f));
         glm::vec3 viewLightDir = glm::normalize(view * glm::vec4(lightDir, 0.0f));
         glUniform3fv(glGetUniformLocation(objectShader.getProgram(), "light.direction"), 1, glm::value_ptr(viewLightDir));
 
+        glm::vec3 viewLightPos = glm::vec3(view * glm::vec4(lightPos, 1.0));
+        glUniform3f(glGetUniformLocation(objectShader.getProgram(), "light.position"), viewLightPos.x, viewLightPos.y, viewLightPos.z);
+
         glUniformMatrix4fv(glGetUniformLocation(objectShader.getProgram(), "view"), 1, false, glm::value_ptr(view));
         glUniformMatrix4fv(glGetUniformLocation(objectShader.getProgram(), "proj"), 1, false, glm::value_ptr(projection));
 
-        glm::vec3 viewLightPos = glm::vec3(view * glm::vec4(lightPos, 1.0));
-        glUniform3f(glGetUniformLocation(objectShader.getProgram(), "lightSourcePos"), viewLightPos.x, viewLightPos.y, viewLightPos.z);
+
 
         glBindVertexArray(VAO1);
 
