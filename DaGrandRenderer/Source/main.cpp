@@ -232,9 +232,9 @@ int main(int argc, char* argv[])
         glUniform1f(glGetUniformLocation(objectShader.getProgram(), "material.shininess"), objShine);
 
         
-        glm::vec3 lightAmb(0.1f);
+        glm::vec3 lightAmb(0.0f);
 		glm::vec3 lightDiff(0.6f);
-		glm::vec3 lightSpec(0.7f);
+		glm::vec3 lightSpec(1.0f);
         glUniform3fv(glGetUniformLocation(objectShader.getProgram(), "light.ambient"), 1, glm::value_ptr(lightAmb));
         glUniform3fv(glGetUniformLocation(objectShader.getProgram(), "light.diffuse"), 1, glm::value_ptr(lightDiff));
         glUniform3fv(glGetUniformLocation(objectShader.getProgram(), "light.specular"), 1, glm::value_ptr(lightSpec));
@@ -243,12 +243,14 @@ int main(int argc, char* argv[])
         glUniform1f(glGetUniformLocation(objectShader.getProgram(), "light.linear"), 0.09f);
         glUniform1f(glGetUniformLocation(objectShader.getProgram(), "light.quadratic"), 0.032f);
 
-        glm::vec3 lightDir = glm::normalize(glm::vec3(-0.2f, -1.0f, -0.3f));
-        glm::vec3 viewLightDir = glm::normalize(view * glm::vec4(lightDir, 0.0f));
+
+        glm::vec3 viewLightDir = glm::normalize(view * glm::vec4(cameraForwardDir, 0.0f));
         glUniform3fv(glGetUniformLocation(objectShader.getProgram(), "light.direction"), 1, glm::value_ptr(viewLightDir));
 
-        glm::vec3 viewLightPos = glm::vec3(view * glm::vec4(lightPos, 1.0));
+        glm::vec3 viewLightPos = glm::vec3(view * glm::vec4(cameraPos, 1.0));
         glUniform3f(glGetUniformLocation(objectShader.getProgram(), "light.position"), viewLightPos.x, viewLightPos.y, viewLightPos.z);
+        glUniform1f(glGetUniformLocation(objectShader.getProgram(), "light.innerCutOff"), glm::cos(glm::radians(12.5f)));
+        glUniform1f(glGetUniformLocation(objectShader.getProgram(), "light.outerCutOff"), glm::cos(glm::radians(17.5f)));
 
         glUniformMatrix4fv(glGetUniformLocation(objectShader.getProgram(), "view"), 1, false, glm::value_ptr(view));
         glUniformMatrix4fv(glGetUniformLocation(objectShader.getProgram(), "proj"), 1, false, glm::value_ptr(projection));
