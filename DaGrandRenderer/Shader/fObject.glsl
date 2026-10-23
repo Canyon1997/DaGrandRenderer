@@ -34,19 +34,37 @@ uniform Light light;
 
 out vec4 FragColor;
 
-
+vec3 calcPhongShading(vec3 lightDir, vec3 surfNorm);
 float calcAttenuation();
+float calcIntensity(vec3 lightDir);
 
 void main()
 {
-    vec3 result;
     vec3 surfNorm = normalize(surfaceNormal);
-    vec3 lightDir = normalize(light.position - fragPos); // -light.direction: directional light example
+    vec3 lightDir = normalize(light.position - fragPos);
+    vec3 result = calcPhongShading(lightDir, surfNorm);
+    FragColor = vec4(result, 1.0);
+}
 
-    // spot light calculations
+float calcAttenuation()
+{
+    float distance = length(light.position - fragPos);
+    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
+
+    return attenuation;
+}
+
+float calcIntensity(vec3 lightDir)
+{
     float theta = dot(lightDir, normalize(-light.direction));
     float epsilon = light.innerCutOff - light.outerCutOff;
-    float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
+    return clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);
+}
+
+vec3 calcPhongShading(vec3 lightDir, vec3 surfNorm)
+{
+    // spot light calculations
+    float intensity = calcIntensity(lightDir);
     float attenuation = calcAttenuation();
 
     vec3 ambient = vec3(texture(material.diffuse, texCoord)) * light.ambient;
@@ -63,15 +81,5 @@ void main()
     diffuse *= attenuation * intensity;
     specular *= attenuation * intensity;
 
-    result = ambient + diffuse + specular;
-
-    FragColor = vec4(result, 1.0);
-}
-
-float calcAttenuation()
-{
-    float distance = length(light.position - fragPos);
-    float attenuation = 1.0 / (light.constant + light.linear * distance + light.quadratic * (distance * distance));
-
-    return attenuation;
+    return ambient + diffuse + specular;
 }
