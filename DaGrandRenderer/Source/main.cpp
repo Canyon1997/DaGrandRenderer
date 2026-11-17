@@ -244,8 +244,13 @@ int main(int argc, char* argv[])
         glUniform1f(glGetUniformLocation(objectShader.getProgram(), "light.quadratic"), 0.032f);
 
 
-        glm::vec3 viewLightDir = glm::normalize(view * glm::vec4(cameraForwardDir, 0.0f));
-        glUniform3fv(glGetUniformLocation(objectShader.getProgram(), "light.direction"), 1, glm::value_ptr(viewLightDir));
+        glm::vec3 lightSpotDir = glm::normalize(view * glm::vec4(cameraForwardDir, 0.0f));
+        glUniform3fv(glGetUniformLocation(objectShader.getProgram(), "light.spotDirection"), 1, glm::value_ptr(lightSpotDir));
+
+        glm::vec3 lightPointDir = glm::normalize(view * glm::vec4());
+        glUniform3fv(glGetUniformLocation(objectShader.getProgram(), "light.pointDirection"), 1, glm::value_ptr(lightPointDir));
+
+        glUniform3fv(glGetUniformLocation(objectShader.getProgram(), "light.globalDirection"), 1, glm::value_ptr(glm::vec4(-0.2f, -1.0f, -0.3f, 0.0f)));
 
         glm::vec3 viewLightPos = glm::vec3(view * glm::vec4(cameraPos, 1.0));
         glUniform3f(glGetUniformLocation(objectShader.getProgram(), "light.position"), viewLightPos.x, viewLightPos.y, viewLightPos.z);
