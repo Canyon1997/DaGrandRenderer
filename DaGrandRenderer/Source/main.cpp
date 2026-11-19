@@ -146,6 +146,13 @@ int main(int argc, char* argv[])
         glm::vec3(-1.3f,  1.0f, -1.5f)
     };
 
+    glm::vec3 pointLightPositions[] = {
+        glm::vec3(0.7f, 0.2f, 2.0f),
+        glm::vec3(2.3f, -3.3f, -4.0f),
+        glm::vec3(-4.0f, 2.0f, -12.0f),
+        glm::vec3(0.0f, 0.0f, -3.0f)
+    };
+
     unsigned int VBO1;
     unsigned int VAO1;
 
@@ -247,10 +254,17 @@ int main(int argc, char* argv[])
         glm::vec3 lightSpotDir = glm::normalize(view * glm::vec4(cameraForwardDir, 0.0f));
         glUniform3fv(glGetUniformLocation(objectShader.getProgram(), "light.spotDirection"), 1, glm::value_ptr(lightSpotDir));
 
-        glm::vec3 lightPointDir = glm::normalize(view * glm::vec4());
-        glUniform3fv(glGetUniformLocation(objectShader.getProgram(), "light.pointDirection"), 1, glm::value_ptr(lightPointDir));
-
         glUniform3fv(glGetUniformLocation(objectShader.getProgram(), "light.globalDirection"), 1, glm::value_ptr(glm::vec4(-0.2f, -1.0f, -0.3f, 0.0f)));
+
+        for (int i = 0; i < 4; i++)
+        {
+            glm::vec3 viewPointPos = view * glm::vec4(pointLightPositions[i], 1.0f);
+            glUniform3fv(glGetUniformLocation(objectShader.getProgram(), ("pointLights[" + std::to_string(i) + "].pointViewPosition").c_str()), 1, glm::value_ptr(viewPointPos));
+            glUniform1f(glGetUniformLocation(objectShader.getProgram(), ("pointLights[" + std::to_string(i) + "].constant").c_str()), 1.0f);
+            glUniform1f(glGetUniformLocation(objectShader.getProgram(), ("pointLights[" + std::to_string(i) + "].linear").c_str()), 0.09f);
+            glUniform1f(glGetUniformLocation(objectShader.getProgram(), ("pointLights[" + std::to_string(i) + "].quadratic").c_str()), 0.032f);
+        }
+
 
         glm::vec3 viewLightPos = glm::vec3(view * glm::vec4(cameraPos, 1.0));
         glUniform3f(glGetUniformLocation(objectShader.getProgram(), "light.position"), viewLightPos.x, viewLightPos.y, viewLightPos.z);
